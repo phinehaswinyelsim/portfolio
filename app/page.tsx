@@ -94,8 +94,8 @@ const services = [
 const socials: { label: string; href?: string }[] = [
   { label: "GitHub", href: GITHUB },
   { label: "LinkedIn", href: LINKEDIN },
-  { label: "X" },
-  { label: "Facebook" },
+  { label: "X", href: "https://x.com/winyelsim" },
+  { label: "Facebook", href: "https://www.facebook.com/PhinehasWinyelsim" },
 ];
 
 type Theme = "dark" | "light";
@@ -129,14 +129,24 @@ export default function Page() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const subject = encodeURIComponent(`Portfolio inquiry from ${form.name || "your site"}`);
-    const body = encodeURIComponent(
-      `Name: ${form.name}\nEmail: ${form.email}\nInterested in: ${form.interest}\n\n${form.message}`
-    );
-    window.location.href = `mailto:${EMAIL}?subject=${subject}&body=${body}`;
-    setSent(true);
+    try {
+      const response = await fetch("https://formspree.io/f/xbgloljk", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(form)
+      });
+      if (response.ok) {
+        setSent(true);
+      } else {
+        alert("There was a problem submitting your form.");
+      }
+    } catch (error) {
+      alert("There was a problem submitting your form.");
+    }
   };
 
   return (
@@ -445,7 +455,7 @@ export default function Page() {
                       title="Phinehas Winyelsim"
                       className="rounded-full border border-zinc-900/10 px-4 py-2 text-xs text-zinc-500 dark:border-white/10 dark:text-zinc-400"
                     >
-                      {s.label} · Phinehas Winyelsim
+                      {s.label} ↗
                     </span>
                   )
                 )}
@@ -457,7 +467,7 @@ export default function Page() {
               <div className="grid h-full min-h-[320px] place-items-center text-center">
                 <div>
                   <p className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-emerald-500/15 text-2xl text-emerald-600 dark:text-emerald-300">✓</p>
-                  <h3 className="mt-4 font-serif text-3xl">Message ready in your mail app.</h3>
+                  <h3 className="mt-4 font-serif text-3xl">Message sent successfully!</h3>
                   <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">Thanks {form.name || "there"} — I&apos;ll get back to you within 24 hours at {form.email || "your email"}.</p>
                   <button onClick={() => setSent(false)} className="mt-6 text-sm text-amber-700 underline underline-offset-4 dark:text-gold">
                     Send another →
@@ -521,7 +531,7 @@ export default function Page() {
                 >
                   Send message →
                 </button>
-                <p className="text-center text-xs text-zinc-500 dark:text-zinc-600">Opens your mail app addressed to {EMAIL}. No spam. NDA-friendly.</p>
+                <p className="text-center text-xs text-zinc-500 dark:text-zinc-600">Secure form submission. No spam. NDA-friendly.</p>
               </form>
             )}
           </div>
